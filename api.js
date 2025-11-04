@@ -45,10 +45,71 @@ const loadPosts = async () => {
       `;
       showPostContainer.appendChild(div);
     });
+
   } catch (error) {
     console.error("❌ Failed to load posts:", error);
   }
 };
+//latest post
+  const latestPost = async () => {
+  try {
+    const res = await fetch('https://openapi.programming-hero.com/api/retro-forum/latest-posts');
+    const data = await res.json();
+    const latest_Post = data; // API returns an array
 
+    const latestPostContainer = document.getElementById('latest-container');
+    latestPostContainer.innerHTML = ''; // clear old content
+
+    latest_Post.forEach(latest => {
+      const div = document.createElement('div');
+      div.className = 'card bg-white shadow-md border-2 border-[#12132D26] rounded-2xl overflow-hidden';
+
+      div.innerHTML = `
+        <figure class="bg-gray-100 h-48 w-full">
+          <img src="${latest.cover_image}" alt="${latest.title}" class="w-full h-full object-cover" />
+        </figure>
+
+        <div class="card-body">
+          <div class="flex items-center text-gray-500 text-sm gap-2">
+            <i data-lucide="calendar"></i>
+            <span>${latest.author?.posted_date || "No publish date"}</span>
+          </div>
+
+          <h2 class="card-title text-lg font-bold mt-2">
+            ${latest.title}
+          </h2>
+
+          <p class="text-gray-600 text-sm">
+            ${latest.description}
+          </p>
+
+          <div class="flex items-center gap-3 mt-4">
+            <div class="avatar">
+              <div class="w-10 h-10 rounded-full">
+                <img src="${latest.profile_image}" alt="${latest.author?.name || "Unknown"}" />
+              </div>
+            </div>
+            <div>
+              <p class="font-semibold text-sm">${latest.author?.name || "Unknown"}</p>
+              <p class="text-xs text-gray-500">${latest.author?.designation || "Unknown"}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      latestPostContainer.appendChild(div);
+    });
+
+    // optional: lucide icons refresh (if you’re using them)
+    if (typeof lucide !== "undefined") lucide.createIcons();
+
+  } catch (error) {
+    console.error("❌ Failed to load latest posts:", error);
+  }
+};
+
+// Call it
+latestPost();
 
 loadPosts();
+latestPost();
