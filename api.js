@@ -1,11 +1,32 @@
-const loadPosts = async () => {
+const loadPosts = async (category = "") => {
   try {
+    const spinner = document.getElementById('spinner');
+    const showPostContainer = document.getElementById('posts-container');
+    const markReadContainer = document.querySelector('.space-y-3');
+    const markReadCount = document.querySelector('.text-green-500.text-sm.font-medium');
+
+    // Show spinner
+    spinner.classList.remove('hidden');
+    showPostContainer.innerHTML = '';
+    markReadContainer.innerHTML = '';
+
     const res = await fetch(`https://openapi.programming-hero.com/api/retro-forum/posts`);
     const data = await res.json();
-    const showPost = data.posts;
+    let showPost = data.posts;
 
-    const showPostContainer = document.getElementById('posts-container');
-    showPostContainer.innerHTML = '';
+    // 🔸 Show spinner for at least 0.8 seconds
+await new Promise(resolve => setTimeout(resolve, 500));
+    // 🔍 Filter by category (if provided)
+    if (category.trim() !== "") {
+      showPost = showPost.filter(post => 
+        post.category.toLowerCase().includes(category.toLowerCase())
+      );
+    }
+
+    let count = 0;
+
+    // Hide spinner after data is ready
+    spinner.classList.add('hidden');
 
     showPost.forEach(post => {
       const div = document.createElement('div');
@@ -24,9 +45,7 @@ const loadPosts = async () => {
               <span>Author : ${post.author.name}</span>
             </div>
 
-            <h2 class="font-semibold text-lg sm:text-xl text-gray-900">
-              ${post.title}
-            </h2>
+            <h2 class="font-semibold text-lg sm:text-xl text-gray-900">${post.title}</h2>
 
             <p class="text-sm text-gray-600 mt-1">${post.description}</p>
 
@@ -36,13 +55,29 @@ const loadPosts = async () => {
               <span class="flex items-center gap-1"><i class="fa-regular fa-comment"></i>${post.comment_count}</span>
               <span class="flex items-center gap-1"><i class="fa-regular fa-eye"></i>${post.view_count}</span>
               <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i>${post.posted_time}</span>
-              <button class="btn btn-circle btn-sm bg-green-500 hover:bg-green-600 text-white ml-auto">
-                <i class="fa-solid fa-paper-plane"></i>
+              <button class="btn btn-circle btn-sm bg-green-500 hover:bg-green-600 text-white ml-auto send-btn">
+              <i class="fa-solid fa-message text-lg"></i>
               </button>
             </div>
           </div>
         </div>
       `;
+
+      div.querySelector('.send-btn').addEventListener('click', () => {
+        count++;
+        markReadCount.innerHTML = `<i class="fa-solid fa-check text-green-500"></i> Mark as read (${count})`;
+
+        const smallDiv = document.createElement('div');
+        smallDiv.className = 'flex justify-between items-center bg-gray-50 rounded-xl px-4 py-3 hover:bg-gray-100 transition';
+        smallDiv.innerHTML = `
+          <p class="text-gray-800 font-medium text-sm">${post.title}</p>
+          <div class="flex items-center gap-1 text-gray-500 text-sm">
+            <i class="fa-regular fa-eye"></i>${post.view_count}
+          </div>
+        `;
+        markReadContainer.appendChild(smallDiv);
+      });
+
       showPostContainer.appendChild(div);
     });
 
@@ -50,6 +85,18 @@ const loadPosts = async () => {
     console.error("❌ Failed to load posts:", error);
   }
 };
+
+
+loadPosts();
+// search button
+const searchBtn = document.querySelector('button.bg-purple-500');
+const searchInput = document.querySelector('input[type="search"]');
+
+searchBtn.addEventListener('click', () => {
+  const category = searchInput.value.trim();
+  loadPosts(category);
+});
+
 //latest post
   const latestPost = async () => {
   try {
@@ -109,7 +156,4 @@ const loadPosts = async () => {
 };
 
 // Call it
-latestPost();
-
-loadPosts();
 latestPost();
