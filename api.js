@@ -147,7 +147,7 @@ searchBtn.addEventListener('click', () => {
       latestPostContainer.appendChild(div);
     });
 
-    // optional: lucide icons refresh (if you’re using them)
+    // lucide icons refresh 
     if (typeof lucide !== "undefined") lucide.createIcons();
 
   } catch (error) {
@@ -155,5 +155,4 @@ searchBtn.addEventListener('click', () => {
   }
 };
 
-// Call it
 latestPost();
