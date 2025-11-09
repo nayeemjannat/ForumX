@@ -14,9 +14,9 @@ const loadPosts = async (category = "") => {
     const data = await res.json();
     let showPost = data.posts;
 
-    // 🔸 Show spinner for at least 0.8 seconds
+    //  Show spinner for at least 0.5 seconds
 await new Promise(resolve => setTimeout(resolve, 500));
-    // 🔍 Filter by category (if provided)
+    // 🔍 Filter by category 
     if (category.trim() !== "") {
       showPost = showPost.filter(post => 
         post.category.toLowerCase().includes(category.toLowerCase())
@@ -119,7 +119,7 @@ searchBtn.addEventListener('click', () => {
         <div class="card-body">
           <div class="flex items-center text-gray-500 text-sm gap-2">
             <i data-lucide="calendar"></i>
-            <span>${latest.author?.posted_date || "No publish date"}</span>
+            <span>${latest.author?.posted_date ? latest.author.posted_date : "No publish date"}</span>
           </div>
 
           <h2 class="card-title text-lg font-bold mt-2">
