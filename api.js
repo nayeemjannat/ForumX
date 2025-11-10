@@ -5,29 +5,37 @@ const loadPosts = async (category = "") => {
     const markReadContainer = document.querySelector('.space-y-3');
     const markReadCount = document.querySelector('.text-green-500.text-sm.font-medium');
 
-    // Show spinner
+    // Show spinner (start loading)
     spinner.classList.remove('hidden');
+    spinner.classList.add('flex');
+
+    // clear old content
     showPostContainer.innerHTML = '';
     markReadContainer.innerHTML = '';
 
+    // fetch data
     const res = await fetch(`https://openapi.programming-hero.com/api/retro-forum/posts`);
     const data = await res.json();
+
+    // wait at least 1 second before hiding spinner
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    //  Hide spinner
+    spinner.classList.add('hidden');
+    spinner.classList.remove('flex');
+
     let showPost = data.posts;
 
-    //  Show spinner for at least 0.5 seconds
-await new Promise(resolve => setTimeout(resolve, 500));
-    // 🔍 Filter by category 
+    // filter by category 
     if (category.trim() !== "") {
-      showPost = showPost.filter(post => 
+      showPost = showPost.filter(post =>
         post.category.toLowerCase().includes(category.toLowerCase())
       );
     }
 
     let count = 0;
 
-    // Hide spinner after data is ready
-    spinner.classList.add('hidden');
-
+    // display posts
     showPost.forEach(post => {
       const div = document.createElement('div');
       div.className = 'card bg-base-100 shadow-md border border-gray-200 rounded-2xl p-4 sm:p-6';
@@ -46,7 +54,6 @@ await new Promise(resolve => setTimeout(resolve, 500));
             </div>
 
             <h2 class="font-semibold text-lg sm:text-xl text-gray-900">${post.title}</h2>
-
             <p class="text-sm text-gray-600 mt-1">${post.description}</p>
 
             <div class="border-t border-gray-200 my-3"></div>
@@ -56,13 +63,14 @@ await new Promise(resolve => setTimeout(resolve, 500));
               <span class="flex items-center gap-1"><i class="fa-regular fa-eye"></i>${post.view_count}</span>
               <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i>${post.posted_time}</span>
               <button class="btn btn-circle btn-sm bg-green-500 hover:bg-green-600 text-white ml-auto send-btn">
-              <i class="fa-solid fa-message text-lg"></i>
+                <i class="fa-solid fa-message text-lg"></i>
               </button>
             </div>
           </div>
         </div>
       `;
 
+      // handle "Mark as Read"
       div.querySelector('.send-btn').addEventListener('click', () => {
         count++;
         markReadCount.innerHTML = `<i class="fa-solid fa-check text-green-500"></i> Mark as read (${count})`;
@@ -86,10 +94,10 @@ await new Promise(resolve => setTimeout(resolve, 500));
   }
 };
 
-
 loadPosts();
+
 // search button
-const searchBtn = document.querySelector('button.bg-purple-500');
+const searchBtn = document.querySelector('button.bg-indigo-600');
 const searchInput = document.querySelector('input[type="search"]');
 
 searchBtn.addEventListener('click', () => {
